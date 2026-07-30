@@ -1,0 +1,29 @@
+<% content_for :title, "Notes — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow"><%= area_meta(life_area)[:label] %></span>
+    <h1>Notes</h1>
+    <p class="page-head__sub"><%= pluralize(@notes.size, "note", plural: "notes") %> dans cet espace.</p>
+  </div>
+  <div class="page-head__actions">
+    <%= link_to "Nouvelle note", new_note_path, class: "btn btn--primary" %>
+  </div>
+</header>
+
+<% if @notes.any? %>
+  <div class="grid grid--cards">
+    <% @notes.each do |note| %>
+      <%= link_to note_path(note), class: "card" do %>
+        <h3 class="card__title"><%= note.pinned? ? "★ " : "" %><%= note.title %></h3>
+        <p class="card__text"><%= note.excerpt %></p>
+        <div class="card__foot">
+          <span><%= note.project&.name || "Sans projet" %></span>
+          <span><%= note.updated_at.strftime("%d/%m/%Y") %></span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="empty">Aucune note. <%= link_to "Écrire la première", new_note_path, class: "panel__link" %></div>
+<% end %>

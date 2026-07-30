@@ -1,0 +1,64 @@
+<% content_for :title, "#{@project.name} — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow">
+      <%= area_meta(life_area)[:label] %> · <%= status_label(@project.status) %>
+    </span>
+    <h1><span class="chip chip--<%= @project.color.presence || "cyan" %>"></span> <%= @project.name %></h1>
+    <p class="page-head__sub"><%= @project.description.presence || "Pas de description." %></p>
+  </div>
+  <div class="page-head__actions">
+    <%= link_to "Ajouter une tâche", new_task_path(project_id: @project.id), class: "btn btn--primary" %>
+    <%= link_to "Éditer", edit_project_path(@project), class: "btn" %>
+  </div>
+</header>
+
+<div class="grid grid--stats" style="margin-bottom: 22px;">
+  <div class="stat stat--accent">
+    <div class="stat__value"><%= @project.progress %>%</div>
+    <div class="stat__label">Avancement</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= @project.tasks.unfinished.count %></div>
+    <div class="stat__label">Tâches ouvertes</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= @project.tasks.done.count %></div>
+    <div class="stat__label">Terminées</div>
+  </div>
+</div>
+
+<div class="grid grid--split">
+  <section class="panel">
+    <div class="panel__head"><span class="panel__title">Tâches</span></div>
+    <% if @tasks.any? %>
+      <ul class="task-list">
+        <%= render partial: "tasks/task", collection: @tasks, as: :task %>
+      </ul>
+    <% else %>
+      <div class="empty">Aucune tâche rattachée.</div>
+    <% end %>
+  </section>
+
+  <section class="panel">
+    <div class="panel__head">
+      <span class="panel__title">Notes</span>
+      <%= link_to "Ajouter", new_note_path(project_id: @project.id), class: "panel__link" %>
+    </div>
+    <% if @notes.any? %>
+      <ul class="stack" style="gap: 12px;">
+        <% @notes.each do |note| %>
+          <li>
+            <%= link_to note_path(note) do %>
+              <strong style="font-size: 14px;"><%= note.pinned? ? "★ " : "" %><%= note.title %></strong>
+              <p class="card__text" style="margin-top: 4px;"><%= note.excerpt(90) %></p>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="empty">Aucune note.</div>
+    <% end %>
+  </section>
+</div>

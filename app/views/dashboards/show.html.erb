@@ -1,0 +1,115 @@
+<% meta = area_meta(life_area) %>
+<% content_for :title, "#{meta[:label]} — Altea" %>
+
+<section class="panel hero">
+  <div>
+    <span class="page-head__eyebrow"><%= meta[:label] %> · <%= meta[:subtitle] %></span>
+    <h2 class="hero__greeting">
+      <%= work_area? ? "Votre journée professionnelle" : "Votre espace personnel" %>
+    </h2>
+    <p class="hero__line">
+      <% if @overdue_count.positive? %>
+        <%= pluralize(@overdue_count, "tâche est en retard", plural: "tâches sont en retard") %>.
+        Commencez par là.
+      <% elsif @due_today_count.positive? %>
+        <%= pluralize(@due_today_count, "tâche", plural: "tâches") %> à boucler aujourd'hui. Rien en retard.
+      <% else %>
+        Aucune urgence en vue. Bon moment pour avancer sur le fond.
+      <% end %>
+    </p>
+    <div class="page-head__actions" style="margin-top: 18px;">
+      <%= link_to "Nouvelle tâche", new_task_path, class: "btn btn--primary" %>
+      <%= link_to "Nouveau projet", new_project_path, class: "btn" %>
+    </div>
+  </div>
+
+  <div class="hero__portrait">
+    <%= image_tag altea_avatar, alt: "Altea", loading: "lazy" %>
+  </div>
+</section>
+
+<div class="grid grid--stats" style="margin-bottom: 22px;">
+  <div class="stat stat--accent">
+    <div class="stat__value"><%= @tasks.unfinished.count %></div>
+    <div class="stat__label">Tâches ouvertes</div>
+  </div>
+  <div class="stat <%= "stat--alert" if @overdue_count.positive? %>">
+    <div class="stat__value"><%= @overdue_count %></div>
+    <div class="stat__label">En retard</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= @due_today_count %></div>
+    <div class="stat__label">Pour aujourd'hui</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value"><%= @done_this_week %></div>
+    <div class="stat__label">Terminées (7 j)</div>
+  </div>
+</div>
+
+<div class="grid grid--split">
+  <section class="panel">
+    <div class="panel__head">
+      <span class="panel__title">Prochaines tâches</span>
+      <%= link_to "Tout voir", tasks_path, class: "panel__link" %>
+    </div>
+
+    <% if @open_tasks.any? %>
+      <ul class="task-list">
+        <%= render partial: "tasks/task", collection: @open_tasks, as: :task %>
+      </ul>
+    <% else %>
+      <div class="empty">Rien à faire ici. <%= link_to "Ajouter une tâche", new_task_path, class: "panel__link" %></div>
+    <% end %>
+  </section>
+
+  <div class="stack">
+    <section class="panel">
+      <div class="panel__head">
+        <span class="panel__title">Projets actifs</span>
+        <%= link_to "Tout voir", projects_path, class: "panel__link" %>
+      </div>
+
+      <% if @projects.any? %>
+        <ul class="stack" style="gap: 12px;">
+          <% @projects.each do |project| %>
+            <li>
+              <%= link_to project_path(project) do %>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="chip chip--<%= project.color.presence || "cyan" %>"></span>
+                  <strong style="font-size: 14px;"><%= project.name %></strong>
+                  <span class="muted" style="margin-left: auto; font-size: 12px;"><%= project.progress %>%</span>
+                </div>
+                <div class="progress"><div class="progress__bar" style="width: <%= project.progress %>%"></div></div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="empty">Aucun projet actif.</div>
+      <% end %>
+    </section>
+
+    <section class="panel">
+      <div class="panel__head">
+        <span class="panel__title">Notes épinglées</span>
+        <%= link_to "Tout voir", notes_path, class: "panel__link" %>
+      </div>
+
+      <% if @notes.any? %>
+        <ul class="stack" style="gap: 12px;">
+          <% @notes.each do |note| %>
+            <li>
+              <%= link_to note_path(note) do %>
+                <strong style="font-size: 14px;"><%= note.pinned? ? "★ " : "" %><%= note.title %></strong>
+                <p class="card__text" style="margin-top: 4px;"><%= note.excerpt(90) %></p>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="empty">Aucune note.</div>
+      <% end %>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,12 @@
+<% content_for :title, "#{@task.title} — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow"><%= area_meta(life_area)[:label] %></span>
+    <h1>Modifier la tâche</h1>
+  </div>
+</header>
+
+<section class="panel">
+  <%= render "form", task: @task %>
+</section>

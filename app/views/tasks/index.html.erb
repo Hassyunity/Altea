@@ -1,0 +1,28 @@
+<% content_for :title, "Tâches — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow"><%= area_meta(life_area)[:label] %></span>
+    <h1>Tâches</h1>
+    <p class="page-head__sub"><%= pluralize(@tasks.size, "tâche", plural: "tâches") %> dans ce filtre.</p>
+  </div>
+  <div class="page-head__actions">
+    <%= link_to "Nouvelle tâche", new_task_path, class: "btn btn--primary" %>
+  </div>
+</header>
+
+<nav class="filters">
+  <% { "open" => "À faire", "overdue" => "En retard", "done" => "Terminées", "all" => "Toutes" }.each do |key, label| %>
+    <%= link_to label, tasks_path(filter: key), aria: { current: ("page" if @filter == key) } %>
+  <% end %>
+</nav>
+
+<section class="panel">
+  <% if @tasks.any? %>
+    <ul class="task-list">
+      <%= render partial: "tasks/task", collection: @tasks, as: :task %>
+    </ul>
+  <% else %>
+    <div class="empty">Aucune tâche pour ce filtre.</div>
+  <% end %>
+</section>

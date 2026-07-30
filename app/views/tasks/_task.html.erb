@@ -1,0 +1,37 @@
+<li class="task <%= "task--done" if task.done? %>" id="<%= dom_id(task) %>">
+  <div class="task__check">
+    <%= button_to toggle_task_path(task), method: :patch,
+          form: { class: "contents" },
+          aria: { label: task.done? ? "Rouvrir la tâche" : "Marquer comme terminée" } do %>
+      <%= task.done? ? "✓" : "" %>
+    <% end %>
+  </div>
+
+  <div class="task__body">
+    <%= link_to task.title, task_path(task), class: "task__title" %>
+
+    <div class="task__meta">
+      <% if task.due_on.present? %>
+        <span class="badge <%= "badge--danger" if task.overdue? %>"><%= due_label(task.due_on) %></span>
+      <% end %>
+      <% if task.priority.in?(%w[high urgent]) %>
+        <span class="badge <%= task.priority == "urgent" ? "badge--danger" : "badge--warn" %>">
+          <%= priority_label(task.priority) %>
+        </span>
+      <% end %>
+      <% if task.status == "doing" %>
+        <span class="badge badge--accent">En cours</span>
+      <% end %>
+      <% if task.project %>
+        <%= link_to project_path(task.project), class: "badge" do %>
+          <span class="chip chip--<%= task.project.color.presence || "cyan" %>"></span>
+          <%= task.project.name %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="task__actions">
+    <%= link_to "Éditer", edit_task_path(task), class: "btn btn--ghost btn--sm" %>
+  </div>
+</li>

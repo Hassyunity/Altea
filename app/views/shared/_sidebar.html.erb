@@ -1,0 +1,41 @@
+<aside class="sidebar">
+  <div class="brand">
+    <span class="brand__avatar">
+      <%= image_tag altea_avatar, alt: "Altea", loading: "eager" %>
+    </span>
+    <span class="brand__text">
+      <span class="brand__name">ALTEA</span>
+      <span class="brand__tag">assistant de vie</span>
+    </span>
+  </div>
+
+  <nav class="nav">
+    <% LifeAreaScoped::LIFE_AREAS.each do |area| %>
+      <% meta = area_meta(area) %>
+      <section class="nav__area <%= "nav__area--current" if area == life_area %>" data-area="<%= area %>">
+        <%= link_to dashboard_path(life_area: area), class: "nav__area-head" do %>
+          <span class="nav__area-icon"><%= meta[:icon] %></span>
+          <span class="nav__area-label"><%= meta[:label] %></span>
+          <span class="nav__area-sub"><%= meta[:subtitle] %></span>
+        <% end %>
+
+        <ul class="nav__list">
+          <% area_sections(area).each do |item| %>
+            <li>
+              <%= link_to item[:path],
+                    class: class_names("nav__link", "nav__link--active" => nav_active?(item[:path], match: item.fetch(:match, :prefix))) do %>
+                <span class="nav__link-icon"><%= item[:icon] %></span>
+                <%= item[:name] %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+  </nav>
+
+  <div class="sidebar__foot">
+    <span class="pulse"></span>
+    <span>Altea en ligne</span>
+  </div>
+</aside>

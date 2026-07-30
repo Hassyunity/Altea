@@ -1,0 +1,185 @@
+/* Altea — first-entry sequence: the portrait turns to face you, then she speaks. */
+
+body.intro-open { overflow: hidden; }
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background:
+    radial-gradient(760px 520px at 32% 45%, rgba(18, 74, 74, 0.5), transparent 70%),
+    radial-gradient(900px 600px at 80% 20%, rgba(12, 44, 60, 0.45), transparent 65%),
+    #01070a;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.intro[hidden] { display: none; }
+.intro--leaving { opacity: 0; }
+
+.intro__stage {
+  display: grid;
+  grid-template-columns: minmax(240px, 330px) minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+  max-width: 940px;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------- portrait */
+
+.intro__portrait {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 3 / 4;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(120, 220, 210, 0.28);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6), 0 30px 90px rgba(0, 0, 0, 0.65);
+  transform-style: preserve-3d;
+}
+
+.intro__portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 55% 30%;
+  display: block;
+
+  /* Pose 1: turned away, in shadow. */
+  transform: perspective(1500px) rotateY(-64deg) scale(1.14);
+  transform-origin: 78% 50%;
+  filter: brightness(0.34) saturate(0.55) blur(3px);
+  opacity: 0.55;
+  transition:
+    transform 2s cubic-bezier(0.22, 0.9, 0.24, 1),
+    filter 2s ease-out,
+    opacity 1.2s ease-out;
+}
+
+/* Pose 2: facing the visitor. */
+.intro--turning .intro__portrait img {
+  transform: perspective(1500px) rotateY(0deg) scale(1);
+  filter: brightness(1) saturate(1.05) blur(0);
+  opacity: 1;
+}
+
+.intro__portrait::after {
+  /* neon rim that lights up as she comes round */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 60px rgba(45, 215, 195, 0.32);
+  opacity: 0;
+  transition: opacity 1.6s ease-out 0.5s;
+  pointer-events: none;
+}
+
+.intro--turning .intro__portrait::after { opacity: 1; }
+
+.intro__sweep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 38%, rgba(180, 255, 245, 0.28) 50%, transparent 62%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.intro--turning .intro__sweep {
+  animation: intro-sweep 2.1s cubic-bezier(0.3, 0.7, 0.2, 1) 0.25s 1 forwards;
+}
+
+@keyframes intro-sweep {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(120%); }
+}
+
+/* --------------------------------------------------------------- speech */
+
+.intro__speech { min-width: 0; }
+
+.intro__line {
+  min-height: 1.5em;
+  margin-bottom: 10px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-dim);
+  letter-spacing: 0.01em;
+}
+
+.intro__line--lead {
+  font-size: 30px;
+  line-height: 1.25;
+  font-weight: 600;
+  color: #ecfbf7;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+
+/* blinking caret while a line is being typed */
+.intro__line--active::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 3px;
+  vertical-align: -0.14em;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  animation: intro-caret 0.85s steps(1) infinite;
+}
+
+@keyframes intro-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.intro__actions {
+  margin-top: 26px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.intro__actions.is-visible { opacity: 1; transform: translateY(0); }
+.intro__actions[hidden] { display: none; }
+
+.intro__skip {
+  position: absolute;
+  top: 22px;
+  right: 26px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text-faint);
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.intro__skip:hover { color: var(--text); border-color: var(--line-strong); }
+
+/* ---------------------------------------------------- reduced motion / small screens */
+
+.intro--static .intro__portrait img { transition: none; }
+.intro--static .intro__sweep { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro__portrait img { transition: none; }
+  .intro__sweep { display: none; }
+  .intro__line--active::after { animation: none; }
+}
+
+@media (max-width: 820px) {
+  .intro { padding: 22px; }
+  .intro__stage { grid-template-columns: minmax(0, 1fr); gap: 26px; justify-items: center; text-align: center; }
+  .intro__portrait { width: min(240px, 62vw); }
+  .intro__line--lead { font-size: 24px; }
+}

@@ -1,0 +1,55 @@
+<%= form_with model: task, class: "form" do |f| %>
+  <% if task.errors.any? %>
+    <div class="form-errors">
+      Impossible d'enregistrer cette tâche :
+      <ul>
+        <% task.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :title, "Titre" %>
+    <%= f.text_field :title, autofocus: true, placeholder: "Que faut-il faire ?" %>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :status, "Statut" %>
+      <%= f.select :status, Task::STATUSES.map { |s| [ status_label(s), s ] } %>
+    </div>
+
+    <div class="field">
+      <%= f.label :priority, "Priorité" %>
+      <%= f.select :priority, Task::PRIORITIES.map { |p| [ priority_label(p), p ] } %>
+    </div>
+
+    <div class="field">
+      <%= f.label :due_on, "Échéance" %>
+      <%= f.date_field :due_on %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :project_id, "Projet" %>
+    <%= f.collection_select :project_id, Project.in_area(life_area).recent, :id, :name,
+          { include_blank: "Aucun projet" } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :details, "Détails" %>
+    <%= f.text_area :details, placeholder: "Contexte, liens, critères de réussite…" %>
+  </div>
+
+  <div class="form__actions">
+    <%= f.submit task.persisted? ? "Enregistrer" : "Créer la tâche", class: "btn btn--primary" %>
+    <%= link_to "Annuler", tasks_path, class: "btn btn--ghost" %>
+    <% if task.persisted? %>
+      <%= button_to "Supprimer", task_path(task), method: :delete,
+            class: "btn btn--danger", style: "margin-left: auto;",
+            form: { data: { turbo_confirm: "Supprimer cette tâche ?" } } %>
+    <% end %>
+  </div>
+<% end %>

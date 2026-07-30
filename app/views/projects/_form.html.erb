@@ -1,0 +1,44 @@
+<%= form_with model: project, class: "form" do |f| %>
+  <% if project.errors.any? %>
+    <div class="form-errors">
+      Impossible d'enregistrer ce projet :
+      <ul>
+        <% project.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name, "Nom" %>
+    <%= f.text_field :name, autofocus: true, placeholder: "Nom du projet" %>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :status, "Statut" %>
+      <%= f.select :status, Project::STATUSES.map { |s| [ status_label(s), s ] } %>
+    </div>
+
+    <div class="field">
+      <%= f.label :color, "Couleur" %>
+      <%= f.select :color, Project::COLORS.map { |c| [ c.capitalize, c ] } %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :description, "Description" %>
+    <%= f.text_area :description, placeholder: "Objectif, périmètre, échéance globale…" %>
+  </div>
+
+  <div class="form__actions">
+    <%= f.submit project.persisted? ? "Enregistrer" : "Créer le projet", class: "btn btn--primary" %>
+    <%= link_to "Annuler", projects_path, class: "btn btn--ghost" %>
+    <% if project.persisted? %>
+      <%= button_to "Supprimer", project_path(project), method: :delete,
+            class: "btn btn--danger", style: "margin-left: auto;",
+            form: { data: { turbo_confirm: "Supprimer ce projet ? Les tâches et notes seront conservées." } } %>
+    <% end %>
+  </div>
+<% end %>

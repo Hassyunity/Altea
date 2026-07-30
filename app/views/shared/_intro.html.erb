@@ -1,0 +1,33 @@
+<%# Plays once per browser session: ALTEA turns to face the user and introduces herself. %>
+<div class="intro"
+     data-controller="intro"
+     data-intro-storage-key-value="altea.intro.seen"
+     data-intro-target="root"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Présentation d'Altea"
+     hidden>
+
+  <div class="intro__stage">
+    <figure class="intro__portrait" data-intro-target="portrait">
+      <%= image_tag altea_avatar, alt: "Altea", loading: "eager" %>
+      <span class="intro__sweep" aria-hidden="true"></span>
+    </figure>
+
+    <div class="intro__speech">
+      <% altea_intro_lines.each_with_index do |line, index| %>
+        <p class="intro__line <%= "intro__line--lead" if index <= 1 %>"
+           data-intro-target="line"
+           data-text="<%= line %>"></p>
+      <% end %>
+
+      <div class="intro__actions" data-intro-target="actions" hidden>
+        <button type="button" class="btn btn--primary" data-action="intro#dismiss" data-intro-target="enter">
+          Entrer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="intro__skip" data-action="intro#dismiss">Passer</button>
+</div>

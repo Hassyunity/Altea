@@ -1,0 +1,34 @@
+<% content_for :title, "Projets — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow"><%= area_meta(life_area)[:label] %></span>
+    <h1>Projets</h1>
+    <p class="page-head__sub"><%= pluralize(@projects.size, "projet", plural: "projets") %> dans cet espace.</p>
+  </div>
+  <div class="page-head__actions">
+    <%= link_to "Nouveau projet", new_project_path, class: "btn btn--primary" %>
+  </div>
+</header>
+
+<% if @projects.any? %>
+  <div class="grid grid--cards">
+    <% @projects.each do |project| %>
+      <%= link_to project_path(project), class: "card" do %>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <span class="chip chip--<%= project.color.presence || "cyan" %>"></span>
+          <span class="badge"><%= status_label(project.status) %></span>
+        </div>
+        <h3 class="card__title"><%= project.name %></h3>
+        <p class="card__text"><%= project.description.presence&.truncate(120) || "Pas de description." %></p>
+        <div class="progress"><div class="progress__bar" style="width: <%= project.progress %>%"></div></div>
+        <div class="card__foot">
+          <span><%= pluralize(project.tasks.unfinished.count, "tâche ouverte", plural: "tâches ouvertes") %></span>
+          <span class="mono"><%= project.progress %>%</span>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="empty">Aucun projet ici. <%= link_to "Créer le premier", new_project_path, class: "panel__link" %></div>
+<% end %>

@@ -1,0 +1,24 @@
+<% content_for :title, "#{@note.title} — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow">
+      <%= area_meta(life_area)[:label] %>
+      <% if @note.project %> · <%= link_to @note.project.name, project_path(@note.project) %><% end %>
+    </span>
+    <h1><%= @note.pinned? ? "★ " : "" %><%= @note.title %></h1>
+    <p class="page-head__sub">Modifiée le <%= @note.updated_at.strftime("%d/%m/%Y à %H:%M") %></p>
+  </div>
+  <div class="page-head__actions">
+    <%= button_to @note.pinned? ? "Désépingler" : "Épingler", pin_note_path(@note), method: :patch, class: "btn" %>
+    <%= link_to "Éditer", edit_note_path(@note), class: "btn btn--primary" %>
+  </div>
+</header>
+
+<section class="panel">
+  <% if @note.body.present? %>
+    <div class="note-body"><%= @note.body %></div>
+  <% else %>
+    <div class="empty">Cette note est vide.</div>
+  <% end %>
+</section>

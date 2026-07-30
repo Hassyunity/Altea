@@ -1,0 +1,43 @@
+<%= form_with model: note, class: "form" do |f| %>
+  <% if note.errors.any? %>
+    <div class="form-errors">
+      Impossible d'enregistrer cette note :
+      <ul>
+        <% note.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :title, "Titre" %>
+    <%= f.text_field :title, autofocus: true, placeholder: "Titre de la note" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :project_id, "Projet" %>
+    <%= f.collection_select :project_id, Project.in_area(life_area).recent, :id, :name,
+          { include_blank: "Aucun projet" } %>
+  </div>
+
+  <div class="field">
+    <%= f.label :body, "Contenu" %>
+    <%= f.text_area :body, style: "min-height: 260px;" %>
+  </div>
+
+  <div class="field field--inline">
+    <%= f.check_box :pinned %>
+    <%= f.label :pinned, "Épingler cette note" %>
+  </div>
+
+  <div class="form__actions">
+    <%= f.submit note.persisted? ? "Enregistrer" : "Créer la note", class: "btn btn--primary" %>
+    <%= link_to "Annuler", notes_path, class: "btn btn--ghost" %>
+    <% if note.persisted? %>
+      <%= button_to "Supprimer", note_path(note), method: :delete,
+            class: "btn btn--danger", style: "margin-left: auto;",
+            form: { data: { turbo_confirm: "Supprimer cette note ?" } } %>
+    <% end %>
+  </div>
+<% end %>
