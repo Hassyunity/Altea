@@ -1,0 +1,66 @@
+<%= form_with model: account, class: "form" do |f| %>
+  <% if account.errors.any? %>
+    <div class="form-errors">
+      Impossible d'enregistrer ce compte :
+      <ul>
+        <% account.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name, "Nom du compte" %>
+    <%= f.text_field :name, autofocus: true, placeholder: "Compte courant, Coffre maison, MVola perso…" %>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :kind, "Type" %>
+      <%= f.select :kind, Account::KINDS.map { |k| [ account_kind_label(k), k ] } %>
+    </div>
+
+    <div class="field">
+      <%= f.label :institution, "Établissement" %>
+      <%= f.text_field :institution, placeholder: "BNI, BOA, BFV, Telma…" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :currency, "Devise" %>
+      <%= f.select :currency, Account::CURRENCIES %>
+    </div>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :opening_balance, "Solde d'ouverture" %>
+      <%= f.text_field :opening_balance, value: account.opening_balance, inputmode: "decimal", placeholder: "0" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :color, "Couleur" %>
+      <%= f.select :color, Account::COLORS.map { |c| [ c.capitalize, c ] } %>
+    </div>
+  </div>
+
+  <div class="field">
+    <%= f.label :notes, "Notes" %>
+    <%= f.text_area :notes, placeholder: "Numéro de compte, agence, code…" %>
+  </div>
+
+  <div class="field field--inline">
+    <%= f.check_box :archived %>
+    <%= f.label :archived, "Archiver ce compte (exclu des totaux)" %>
+  </div>
+
+  <div class="form__actions">
+    <%= f.submit account.persisted? ? "Enregistrer" : "Créer le compte", class: "btn btn--primary" %>
+    <%= link_to "Annuler", accounts_path, class: "btn btn--ghost" %>
+    <% if account.persisted? %>
+      <%= button_to "Supprimer", account_path(account), method: :delete,
+            class: "btn btn--danger", style: "margin-left: auto;",
+            form: { data: { turbo_confirm: "Supprimer ce compte et toutes ses opérations ?" } } %>
+    <% end %>
+  </div>
+<% end %>

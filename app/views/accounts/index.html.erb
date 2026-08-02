@@ -1,0 +1,73 @@
+<% content_for :title, "Comptes — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow"><%= area_meta(life_area)[:label] %> · Banque</span>
+    <h1>Comptes</h1>
+    <p class="page-head__sub">Banque, coffre-fort, mobile money et espèces.</p>
+  </div>
+  <div class="page-head__actions">
+    <%= link_to "Nouvelle opération", new_transaction_path, class: "btn" %>
+    <%= link_to "Nouveau compte", new_account_path, class: "btn btn--primary" %>
+  </div>
+</header>
+
+<div class="grid grid--stats" style="margin-bottom: 22px;">
+  <% @totals_by_currency.each do |currency, cents| %>
+    <div class="stat stat--accent">
+      <div class="stat__value"><%= money(cents, currency) %></div>
+      <div class="stat__label">Total <%= currency %></div>
+    </div>
+  <% end %>
+
+  <div class="stat">
+    <div class="stat__value amount--out"><%= money(@month_expenses) %></div>
+    <div class="stat__label">Dépenses · <%= month_label(@month) %></div>
+  </div>
+  <div class="stat">
+    <div class="stat__value amount--in"><%= money(@month_income) %></div>
+    <div class="stat__label">Revenus · <%= month_label(@month) %></div>
+  </div>
+</div>
+
+<% if @accounts.any? %>
+  <% @accounts.group_by(&:kind).each do |kind, accounts| %>
+    <section style="margin-bottom: 26px;">
+      <div class="panel__head">
+        <span class="panel__title"><%= account_kind_icon(kind) %> <%= account_kind_label(kind) %></span>
+      </div>
+
+      <div class="grid grid--cards">
+        <% accounts.each do |account| %>
+          <%= link_to account_path(account), class: class_names("card", "account-card", "account-card--archived" => account.archived?) do %>
+            <div class="account-card__top">
+              <span class="chip chip--<%= account.color.presence || "cyan" %>"></span>
+              <h3 class="card__title" style="margin: 0;"><%= account.name %></h3>
+              <% if account.archived? %><span class="badge">Archivé</span><% end %>
+            </div>
+
+            <% if account.institution.present? %>
+              <p class="card__text"><%= account.institution %></p>
+            <% end %>
+
+            <% balance = @balances.fetch(account, 0) %>
+            <div class="account-card__balance <%= balance.negative? ? "amount--out" : "" %>">
+              <%= money(balance, account.currency) %>
+            </div>
+
+            <div class="card__foot">
+              <span><%= account_kind_label(account.kind) %></span>
+              <span class="mono"><%= account.currency %></span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+<% else %>
+  <div class="empty">
+    Aucun compte pour l'instant.
+    <%= link_to "Ajoutez votre premier compte", new_account_path, class: "panel__link" %>
+    (banque, MVola, coffre-fort…).
+  </div>
+<% end %>

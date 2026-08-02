@@ -1,0 +1,18 @@
+<%# ALTEA projected from her portrait. The image itself is never distorted —
+    only her mouth moves, through lip-sync frames cross-faded on her voice.
+    Locals: variant ("chamber" or "hud"), alt. %>
+<span class="holo-fig holo-fig--<%= variant %>" data-controller="holo">
+  <span class="holo-fig__layer holo-fig__layer--base">
+    <%= image_tag altea_avatar, alt: alt, loading: "eager" %>
+  </span>
+
+  <% AlteaMouth::FRAME_COUNT.times do |i| %>
+    <span class="holo-fig__layer holo-fig__mouth" data-holo-target="mouth" aria-hidden="true">
+      <%= image_tag "altea/mouth/#{i + 1}.png", alt: "" %>
+    </span>
+  <% end %>
+
+  <span class="holo-fig__tint" aria-hidden="true"></span>
+  <span class="holo-fig__lines" aria-hidden="true"></span>
+  <span class="holo-fig__band" aria-hidden="true"></span>
+</span>

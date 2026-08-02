@@ -3,6 +3,7 @@
   <head>
     <title><%= content_for(:title) || "Altea — Assistant de vie" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#05090f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
@@ -19,7 +20,9 @@
   </head>
 
   <body>
+    <%= render "shared/backdrop" %>
     <%= render "shared/intro" %>
+    <%= render "shared/palette" %>
 
     <div class="shell">
       <%= render "shared/sidebar" %>

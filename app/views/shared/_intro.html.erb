@@ -1,33 +1,127 @@
-<%# Plays once per browser session: ALTEA turns to face the user and introduces herself. %>
+<%# Welcome screen: ALTEA is scanned into existence on her platform, briefs you
+    on what actually needs attention, then hands over the platform. %>
 <div class="intro"
      data-controller="intro"
      data-intro-storage-key-value="altea.intro.seen"
-     data-intro-target="root"
      role="dialog"
      aria-modal="true"
-     aria-label="Présentation d'Altea"
+     aria-label="Point de situation d'Altea"
      hidden>
 
+  <%# armoured carbon panel — the machine's front plate %>
+  <div class="panel-skin" aria-hidden="true">
+    <span class="panel-skin__mesh"></span>
+    <span class="panel-skin__heat panel-skin__heat--1"></span>
+    <span class="panel-skin__heat panel-skin__heat--2"></span>
+    <span class="panel-skin__heat panel-skin__heat--3"></span>
+
+    <span class="panel-skin__plate panel-skin__plate--left"></span>
+    <span class="panel-skin__plate panel-skin__plate--right"></span>
+    <span class="panel-skin__wedge panel-skin__wedge--left"></span>
+    <span class="panel-skin__wedge panel-skin__wedge--right"></span>
+
+    <span class="panel-skin__slot panel-skin__slot--tl"></span>
+    <span class="panel-skin__slot panel-skin__slot--bl"></span>
+    <span class="panel-skin__vent panel-skin__vent--top"><i></i><i></i><i></i></span>
+    <span class="panel-skin__vent panel-skin__vent--bottom"><i></i><i></i><i></i></span>
+
+    <span class="panel-skin__emblem">★</span>
+  </div>
+
   <div class="intro__stage">
-    <figure class="intro__portrait" data-intro-target="portrait">
-      <%= image_tag altea_avatar, alt: "Altea", loading: "eager" %>
-      <span class="intro__sweep" aria-hidden="true"></span>
-    </figure>
+    <% profile = altea_profile %>
+    <aside class="profile">
+      <div class="profile__head">
+        <span class="profile__thumb"><%= image_tag altea_avatar, alt: "" %></span>
+        <span>
+          <span class="profile__code mono">ALT-01A</span>
+          <h2 class="profile__title">ALTEA</h2>
+        </span>
+      </div>
+
+      <p class="profile__link mono"><span class="profile__dot"></span> LIEN NEURONAL ACTIF</p>
+
+      <dl class="profile__rows">
+        <% profile[:rows].each do |label, value| %>
+          <div class="profile__row">
+            <dt><%= label %></dt>
+            <dd><%= value %></dd>
+          </div>
+        <% end %>
+      </dl>
+
+      <div class="profile__scope">
+        <span class="profile__scope-label mono">ANALYSE VOCALE</span>
+        <span class="scope" aria-hidden="true">
+          <% 22.times do |i| %><i style="--b: <%= i %>"></i><% end %>
+        </span>
+      </div>
+
+      <div class="profile__gauges">
+        <% profile[:gauges].each do |gauge| %>
+          <div class="gauge">
+            <span class="gauge__label"><%= gauge[:left] %></span>
+            <span class="gauge__track">
+              <span class="gauge__fill" style="width: <%= gauge[:value] %>%"></span>
+            </span>
+            <span class="gauge__label gauge__label--right"><%= gauge[:right] %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="profile__foot">
+        <span class="profile__spinner" aria-hidden="true"></span>
+        <span class="mono">CONNEXION…</span>
+      </div>
+    </aside>
+
+    <div class="intro__chamber-slot">
+      <%= render "shared/chamber" %>
+      <span class="intro__shock" aria-hidden="true"></span>
+    </div>
 
     <div class="intro__speech">
-      <% altea_intro_lines.each_with_index do |line, index| %>
-        <p class="intro__line <%= "intro__line--lead" if index <= 1 %>"
+      <% briefing.intro_lines.each do |line| %>
+        <p class="intro__line <%= "intro__line--lead" if line[:lead] %>"
            data-intro-target="line"
-           data-text="<%= line %>"></p>
+           data-text="<%= line[:text] %>"
+           data-speech="<%= line[:speech] %>"></p>
       <% end %>
 
+      <ul class="intro__briefing" data-intro-target="briefing">
+        <% briefing.items.each do |item| %>
+          <li class="intro__item intro__item--<%= item.tone %>" data-intro-target="item">
+            <%= link_to briefing_item_path(item), data: { action: "intro#follow" } do %>
+              <span class="intro__item-icon"><%= briefing_item_icon(item) %></span>
+              <span class="intro__item-body">
+                <span class="intro__item-title"><%= item.headline %></span>
+                <span class="intro__item-detail"><%= item.detail %> · <%= briefing_item_area(item) %></span>
+              </span>
+              <span class="intro__item-go" aria-hidden="true">→</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+
+      <p class="intro__boot mono" data-intro-target="boot" hidden>Réveil du système…</p>
+
       <div class="intro__actions" data-intro-target="actions" hidden>
-        <button type="button" class="btn btn--primary" data-action="intro#dismiss" data-intro-target="enter">
-          Entrer
+        <button type="button" class="btn btn--primary" data-action="intro#wake" data-intro-target="enter">
+          Réveiller
         </button>
+        <span class="intro__hint">ou <kbd>Échap</kbd></span>
       </div>
     </div>
   </div>
 
-  <button type="button" class="intro__skip" data-action="intro#dismiss">Passer</button>
+  <span class="intro__flash" aria-hidden="true"></span>
+
+  <div class="intro__controls">
+    <button type="button" class="intro__voice" data-action="intro#toggleVoice"
+            data-intro-target="voice" aria-pressed="true">
+      <span data-intro-target="voiceIcon" aria-hidden="true">🔊</span>
+      <span data-intro-target="voiceLabel">Voix</span>
+    </button>
+    <button type="button" class="intro__skip" data-action="intro#wake">Passer</button>
+  </div>
 </div>

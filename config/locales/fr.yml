@@ -1,0 +1,63 @@
+fr:
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "doit être rempli"
+      inclusion: "n'est pas une valeur valide"
+      invalid: "n'est pas valide"
+      taken: "est déjà utilisé"
+      greater_than: "doit être supérieur à %{count}"
+      greater_than_or_equal_to: "doit être supérieur ou égal à %{count}"
+      not_a_number: "n'est pas un nombre"
+      required: "doit exister"
+
+  activerecord:
+    errors:
+      messages:
+        blank: "doit être rempli"
+        inclusion: "n'est pas une valeur valide"
+        invalid: "n'est pas valide"
+        taken: "est déjà utilisé"
+        greater_than: "doit être supérieur à %{count}"
+        not_a_number: "n'est pas un nombre"
+        required: "doit exister"
+
+    models:
+      account: Compte
+      transaction: Opération
+      project: Projet
+      task: Tâche
+      note: Note
+
+    attributes:
+      account:
+        name: "Le nom"
+        kind: "Le type"
+        institution: "L'établissement"
+        currency: "La devise"
+        opening_balance_cents: "Le solde d'ouverture"
+        color: "La couleur"
+      transaction:
+        account: "Le compte"
+        account_id: "Le compte"
+        transfer_account_id: "Le compte destinataire"
+        amount_cents: "Le montant"
+        occurred_on: "La date"
+        kind: "Le type"
+        category: "La catégorie"
+        description: "Le libellé"
+      project:
+        name: "Le nom"
+        status: "Le statut"
+        color: "La couleur"
+        life_area: "L'espace"
+      task:
+        title: "Le titre"
+        status: "Le statut"
+        priority: "La priorité"
+        due_on: "L'échéance"
+        life_area: "L'espace"
+      note:
+        title: "Le titre"
+        body: "Le contenu"
+        life_area: "L'espace"

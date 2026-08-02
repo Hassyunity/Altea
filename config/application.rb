@@ -38,5 +38,10 @@ module AlteaIaAssist
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # The interface is French; fall back to Rails' English strings for anything
+    # config/locales/fr.yml does not cover.
+    config.i18n.default_locale = :fr
+    config.i18n.fallbacks = [ :en ]
   end
 end

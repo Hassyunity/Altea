@@ -1,0 +1,29 @@
+<% account_id = local_assigns[:account_id] %>
+<li class="tx">
+  <span class="tx__icon tx__icon--<%= transaction.kind %>" aria-hidden="true">
+    <%= transaction.transfer? ? "⇅" : (transaction.income? ? "↓" : "↑") %>
+  </span>
+
+  <div class="tx__body">
+    <%= link_to transaction.label || transaction_kind_label(transaction.kind),
+          edit_transaction_path(transaction), class: "tx__label" %>
+
+    <div class="tx__meta">
+      <span><%= transaction.occurred_on.strftime("%d/%m/%Y") %></span>
+      <% if transaction.category.present? %>
+        <span class="badge"><%= transaction.category %></span>
+      <% end %>
+      <% if transaction.transfer? %>
+        <span class="badge badge--accent">
+          <%= transaction.account.name %> → <%= transaction.transfer_account&.name || "compte supprimé" %>
+        </span>
+      <% elsif account_id.nil? %>
+        <%= link_to transaction.account.name, account_path(transaction.account), class: "badge" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="tx__amount">
+    <%= signed_money(transaction, account_id: account_id) %>
+  </div>
+</li>

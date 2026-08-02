@@ -1,0 +1,21 @@
+<%# The scan chamber: ALTEA's portrait projected on her platform. %>
+<div class="chamber">
+  <span class="chamber__rig" aria-hidden="true"></span>
+  <span class="chamber__beam" aria-hidden="true"></span>
+
+  <span class="chamber__ring chamber__ring--head" aria-hidden="true"></span>
+  <span class="chamber__ring chamber__ring--waist" aria-hidden="true"></span>
+  <span class="chamber__ring chamber__ring--feet" aria-hidden="true"></span>
+
+  <span class="chamber__dust" aria-hidden="true">
+    <% 14.times do |i| %><i style="--p: <%= i %>"></i><% end %>
+  </span>
+
+  <div class="chamber__projection">
+    <%= render "shared/projection", variant: "chamber", alt: "Altea" %>
+  </div>
+
+  <span class="chamber__platform" aria-hidden="true">
+    <i></i><i></i><i></i><i></i>
+  </span>
+</div>

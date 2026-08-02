@@ -1,0 +1,33 @@
+<%# Command palette — ⌘K / Ctrl+K anywhere in the app. %>
+<div class="palette"
+     data-controller="palette"
+     data-palette-items-value="<%= command_palette_items.to_json %>"
+     role="dialog"
+     aria-modal="true"
+     aria-label="Palette de commandes"
+     hidden>
+
+  <div class="palette__scrim" data-action="click->palette#close"></div>
+
+  <div class="palette__panel">
+    <div class="palette__bar">
+      <span class="palette__prompt" aria-hidden="true">›</span>
+      <input type="text"
+             class="palette__input"
+             placeholder="Où voulez-vous aller ? Que voulez-vous créer ?"
+             autocomplete="off"
+             spellcheck="false"
+             data-palette-target="input"
+             data-action="input->palette#filter keydown->palette#navigate">
+      <kbd>ESC</kbd>
+    </div>
+
+    <ul class="palette__list" data-palette-target="list"></ul>
+
+    <div class="palette__foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> naviguer</span>
+      <span><kbd>↵</kbd> ouvrir</span>
+      <span class="muted">ALTEA</span>
+    </div>
+  </div>
+</div>

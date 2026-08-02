@@ -1,0 +1,37 @@
+<%# Always-on assistant HUD: ALTEA projected on her pad, watching the data. %>
+<div class="assistant"
+     data-controller="assistant"
+     data-assistant-lines-value="<%= assistant_briefing.to_json %>"
+     data-assistant-speech-value="<%= briefing.spoken_briefing %>">
+
+  <div class="assistant__orb holo" aria-hidden="true">
+    <span class="holo__emitter"></span>
+    <span class="holo__beam"></span>
+
+    <span class="holo__figure">
+      <%= render "shared/projection", variant: "hud", alt: "" %>
+    </span>
+
+    <span class="holo__pad"></span>
+  </div>
+
+  <div class="assistant__meta">
+    <span class="assistant__name">ALTEA</span>
+    <span class="assistant__code mono">ALT-01A · EN LIGNE</span>
+    <span class="assistant__status" data-assistant-target="status"></span>
+  </div>
+
+  <div class="assistant__foot">
+    <span class="assistant__clock" data-assistant-target="clock">--:--:--</span>
+
+    <span class="assistant__wave" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i>
+    </span>
+
+    <button type="button" class="assistant__speak"
+            data-action="assistant#say" data-assistant-target="speak"
+            title="Écouter le point de situation">
+      <span aria-hidden="true">🔊</span>
+    </button>
+  </div>
+</div>

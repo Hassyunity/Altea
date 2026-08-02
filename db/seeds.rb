@@ -66,4 +66,68 @@ notes.each do |attrs|
   end
 end
 
-puts "Seed: #{Project.count} projets, #{Task.count} tâches, #{Note.count} notes."
+# --- Banque (espace personnel), montants en ariary -------------------------
+
+accounts = {
+  courant: Account.find_or_create_by!(name: "Compte courant", life_area: "personal") do |a|
+    a.kind = "bank"
+    a.institution = "BNI"
+    a.opening_balance_cents = 2_500_000_00
+    a.color = "cyan"
+  end,
+  epargne: Account.find_or_create_by!(name: "Épargne", life_area: "personal") do |a|
+    a.kind = "bank"
+    a.institution = "BOA"
+    a.opening_balance_cents = 8_000_000_00
+    a.color = "azure"
+  end,
+  mvola: Account.find_or_create_by!(name: "MVola perso", life_area: "personal") do |a|
+    a.kind = "mvola"
+    a.institution = "Telma"
+    a.opening_balance_cents = 350_000_00
+    a.color = "emerald"
+  end,
+  coffre: Account.find_or_create_by!(name: "Coffre-fort maison", life_area: "personal") do |a|
+    a.kind = "safe"
+    a.opening_balance_cents = 1_200_000_00
+    a.color = "amber"
+  end,
+  especes: Account.find_or_create_by!(name: "Portefeuille", life_area: "personal") do |a|
+    a.kind = "cash"
+    a.opening_balance_cents = 150_000_00
+    a.color = "rose"
+  end
+}
+
+operations = [
+  { description: "Salaire du mois", account: accounts[:courant], kind: "income",
+    amount_cents: 3_500_000_00, category: "Salaire", days_ago: 12 },
+  { description: "Loyer", account: accounts[:courant], kind: "expense",
+    amount_cents: 800_000_00, category: "Logement", days_ago: 11 },
+  { description: "Facture JIRAMA", account: accounts[:courant], kind: "expense",
+    amount_cents: 145_000_00, category: "Factures", days_ago: 9 },
+  { description: "Courses du marché", account: accounts[:especes], kind: "expense",
+    amount_cents: 95_000_00, category: "Alimentation", days_ago: 6 },
+  { description: "Provisions supermarché", account: accounts[:courant], kind: "expense",
+    amount_cents: 240_000_00, category: "Alimentation", days_ago: 4 },
+  { description: "Carburant", account: accounts[:courant], kind: "expense",
+    amount_cents: 120_000_00, category: "Transport", days_ago: 3 },
+  { description: "Crédit téléphone", account: accounts[:mvola], kind: "expense",
+    amount_cents: 20_000_00, category: "Téléphone & Internet", days_ago: 2 },
+  { description: "Consultation médicale", account: accounts[:mvola], kind: "expense",
+    amount_cents: 60_000_00, category: "Santé", days_ago: 1 },
+  { description: "Mise au coffre", account: accounts[:courant], kind: "transfer",
+    transfer_account: accounts[:coffre], amount_cents: 500_000_00, days_ago: 10 },
+  { description: "Approvisionnement MVola", account: accounts[:courant], kind: "transfer",
+    transfer_account: accounts[:mvola], amount_cents: 100_000_00, days_ago: 8 }
+]
+
+operations.each do |attrs|
+  Transaction.find_or_create_by!(description: attrs[:description], account: attrs[:account]) do |operation|
+    operation.assign_attributes(attrs.except(:description, :account, :days_ago))
+    operation.occurred_on = Date.current - attrs[:days_ago]
+  end
+end
+
+puts "Seed: #{Project.count} projets, #{Task.count} tâches, #{Note.count} notes, " \
+     "#{Account.count} comptes, #{Transaction.count} opérations."

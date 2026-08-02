@@ -1,0 +1,105 @@
+<% content_for :title, "Opérations — Altea" %>
+<% net = @income_cents - @expenses_cents %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow"><%= area_meta(life_area)[:label] %> · Banque</span>
+    <h1>Opérations</h1>
+    <p class="page-head__sub"><%= month_label(@month) %><%= " · #{@account_filter.name}" if @account_filter %></p>
+  </div>
+  <div class="page-head__actions">
+    <%= link_to "Dépense", new_transaction_path(kind: "expense", account_id: @account_filter&.id), class: "btn btn--primary" %>
+    <%= link_to "Revenu", new_transaction_path(kind: "income", account_id: @account_filter&.id), class: "btn" %>
+    <%= link_to "Virement", new_transaction_path(kind: "transfer", account_id: @account_filter&.id), class: "btn" %>
+  </div>
+</header>
+
+<div class="grid grid--stats" style="margin-bottom: 20px;">
+  <div class="stat">
+    <div class="stat__value amount--out"><%= money(@expenses_cents) %></div>
+    <div class="stat__label">Dépenses du mois</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value amount--in"><%= money(@income_cents) %></div>
+    <div class="stat__label">Revenus du mois</div>
+  </div>
+  <div class="stat <%= net.negative? ? "stat--alert" : "stat--accent" %>">
+    <div class="stat__value"><%= money(net) %></div>
+    <div class="stat__label">Solde du mois</div>
+  </div>
+</div>
+
+<nav class="filters">
+  <%= link_to "◀ #{month_label(@month.prev_month)}", transactions_path(month: @month.prev_month.strftime("%Y-%m"), kind: @kind, account_id: @account_filter&.id) %>
+  <% unless @month.beginning_of_month == Date.current.beginning_of_month %>
+    <%= link_to "Ce mois-ci", transactions_path(kind: @kind, account_id: @account_filter&.id) %>
+  <% end %>
+  <%= link_to "#{month_label(@month.next_month)} ▶", transactions_path(month: @month.next_month.strftime("%Y-%m"), kind: @kind, account_id: @account_filter&.id) %>
+</nav>
+
+<nav class="filters">
+  <%= link_to "Toutes", transactions_path(month: @month.strftime("%Y-%m"), account_id: @account_filter&.id),
+        aria: { current: ("page" if @kind.nil?) } %>
+  <% Transaction::KINDS.each do |kind| %>
+    <%= link_to transaction_kind_label(kind, plural: true),
+          transactions_path(month: @month.strftime("%Y-%m"), kind: kind, account_id: @account_filter&.id),
+          aria: { current: ("page" if @kind == kind) } %>
+  <% end %>
+  <% if @account_filter %>
+    <%= link_to "✕ #{@account_filter.name}", transactions_path(month: @month.strftime("%Y-%m"), kind: @kind) %>
+  <% end %>
+</nav>
+
+<div class="grid grid--split">
+  <section class="panel">
+    <div class="panel__head">
+      <span class="panel__title"><%= pluralize(@transactions.size, "opération") %></span>
+    </div>
+
+    <% if @transactions.any? %>
+      <ul class="tx-list">
+        <%= render partial: "transactions/transaction", collection: @transactions, as: :transaction %>
+      </ul>
+    <% else %>
+      <div class="empty">Aucune opération sur cette période.</div>
+    <% end %>
+  </section>
+
+  <div class="stack">
+    <section class="panel">
+      <div class="panel__head"><span class="panel__title">Dépenses par catégorie</span></div>
+
+      <% if @by_category.any? %>
+        <%= render "donut", by_category: @by_category %>
+      <% else %>
+        <div class="empty">Pas de dépense ce mois-ci.</div>
+      <% end %>
+    </section>
+
+    <section class="panel">
+      <div class="panel__head">
+        <span class="panel__title">Comptes</span>
+        <%= link_to "Gérer", accounts_path, class: "panel__link" %>
+      </div>
+
+      <% if @accounts.any? %>
+        <ul class="stack" style="gap: 10px;">
+          <% balances = Account.balances_for(@accounts) %>
+          <% @accounts.each do |account| %>
+            <li style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px;">
+              <%= link_to transactions_path(month: @month.strftime("%Y-%m"), account_id: account.id) do %>
+                <span class="chip chip--<%= account.color.presence || "cyan" %>"></span>
+                <%= account.name %>
+              <% end %>
+              <span class="mono <%= "amount--out" if balances.fetch(account, 0).negative? %>">
+                <%= money(balances.fetch(account, 0), account.currency) %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="empty"><%= link_to "Créer un compte", new_account_path, class: "panel__link" %></div>
+      <% end %>
+    </section>
+  </div>
+</div>

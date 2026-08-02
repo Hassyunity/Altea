@@ -1,0 +1,38 @@
+<%# by_category: [[label, cents], ...] sorted desc %>
+<% palette = %w[#22e6c8 #38bdf8 #a78bfa #f7b940 #ff6f91 #3ddc97 #7dd3fc #fca5a5] %>
+<% total = by_category.sum { |_, cents| cents } %>
+<% radius = 54 %>
+<% circumference = (2 * Math::PI * radius).round(2) %>
+<% offset = 0.0 %>
+
+<div class="donut">
+  <svg class="donut__svg" viewBox="0 0 140 140" role="img" aria-label="Répartition des dépenses">
+    <circle class="donut__ring donut__track" cx="70" cy="70" r="<%= radius %>" />
+
+    <% by_category.each_with_index do |(_, cents), index| %>
+      <% share = total.positive? ? cents.to_f / total : 0 %>
+      <% length = (share * circumference).round(2) %>
+      <circle class="donut__ring"
+              cx="70" cy="70" r="<%= radius %>"
+              stroke="<%= palette[index % palette.size] %>"
+              stroke-dasharray="<%= length %> <%= (circumference - length).round(2) %>"
+              stroke-dashoffset="<%= -offset.round(2) %>"
+              stroke-linecap="butt" />
+      <% offset += length %>
+    <% end %>
+  </svg>
+
+  <ul class="donut__legend">
+    <% by_category.first(6).each_with_index do |(category, cents), index| %>
+      <li class="donut__item">
+        <span class="chip" style="background: <%= palette[index % palette.size] %>; box-shadow: 0 0 8px <%= palette[index % palette.size] %>;"></span>
+        <span><%= category.presence || "Sans catégorie" %></span>
+        <span><%= total.positive? ? "#{(cents * 100.0 / total).round}%" : "0%" %></span>
+      </li>
+    <% end %>
+    <li class="donut__item" style="margin-top: 4px; border-top: 1px solid var(--edge); padding-top: 8px;">
+      <span style="color: var(--text-faint);">Total</span>
+      <span class="mono" style="margin-left: auto; color: var(--text);"><%= money(total) %></span>
+    </li>
+  </ul>
+</div>

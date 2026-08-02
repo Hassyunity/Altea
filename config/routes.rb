@@ -13,6 +13,10 @@ Rails.application.routes.draw do
     resources :notes do
       patch :pin, on: :member
     end
+
+    # Banque : comptes, coffres-forts, mobile money et suivi des dépenses.
+    resources :accounts
+    resources :transactions
   end
 
   root to: redirect("/work")

@@ -5,11 +5,11 @@ class TasksController < ApplicationController
     scope = Task.in_area(life_area).includes(:project)
     @filter = params[:filter].presence_in(%w[all open done overdue]) || "open"
     @tasks = case @filter
-             when "done" then scope.done.order(completed_at: :desc)
-             when "overdue" then scope.overdue.by_urgency
-             when "all" then scope.by_urgency
-             else scope.unfinished.by_urgency
-             end
+    when "done" then scope.done.order(completed_at: :desc)
+    when "overdue" then scope.overdue.by_urgency
+    when "all" then scope.by_urgency
+    else scope.unfinished.by_urgency
+    end
   end
 
   def show

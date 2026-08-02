@@ -1,0 +1,64 @@
+<%= form_with model: transaction, class: "form", data: { controller: "tx-form" } do |f| %>
+  <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
+
+  <% if transaction.errors.any? %>
+    <div class="form-errors">
+      Impossible d'enregistrer cette opération :
+      <ul>
+        <% transaction.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :kind, "Type d'opération" %>
+    <%= f.select :kind, Transaction::KINDS.map { |k| [ transaction_kind_label(k), k ] },
+          {}, data: { tx_form_target: "kind", action: "change->tx-form#toggle" } %>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <%= f.label :account_id, "Compte" %>
+      <%= f.collection_select :account_id, accounts, :id, :name, { include_blank: "Choisir un compte" } %>
+    </div>
+
+    <div class="field">
+      <%= f.label :amount, "Montant" %>
+      <%= f.text_field :amount, value: transaction.amount, inputmode: "decimal", placeholder: "50 000" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :occurred_on, "Date" %>
+      <%= f.date_field :occurred_on %>
+    </div>
+  </div>
+
+  <div class="field" data-tx-form-target="transferField">
+    <%= f.label :transfer_account_id, "Compte destinataire" %>
+    <%= f.collection_select :transfer_account_id, accounts, :id, :name, { include_blank: "Choisir le compte crédité" } %>
+  </div>
+
+  <div class="field-row" data-tx-form-target="detailFields">
+    <div class="field">
+      <%= f.label :category, "Catégorie" %>
+      <%= f.select :category, Transaction::CATEGORIES, include_blank: "Sans catégorie" %>
+    </div>
+
+    <div class="field">
+      <%= f.label :description, "Libellé" %>
+      <%= f.text_field :description, placeholder: "Courses du samedi, loyer, retrait…" %>
+    </div>
+  </div>
+
+  <div class="form__actions">
+    <%= f.submit transaction.persisted? ? "Enregistrer" : "Enregistrer l'opération", class: "btn btn--primary" %>
+    <%= link_to "Annuler", transactions_path, class: "btn btn--ghost" %>
+    <% if transaction.persisted? %>
+      <%= button_to "Supprimer", transaction_path(transaction), method: :delete,
+            class: "btn btn--danger", style: "margin-left: auto;",
+            form: { data: { turbo_confirm: "Supprimer cette opération ?" } } %>
+    <% end %>
+  </div>
+<% end %>

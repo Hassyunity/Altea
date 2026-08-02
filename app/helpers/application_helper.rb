@@ -25,14 +25,24 @@ module ApplicationHelper
     PRIORITY_LABELS.fetch(value, value.to_s.humanize)
   end
 
-  # Sidebar entries for one life area.
+  # Sidebar entries for one life area. Banking only shows under Personal;
+  # the routes exist for both areas, so moving it is a one-line change.
   def area_sections(area)
-    [
+    sections = [
       { name: "Tableau de bord", path: dashboard_path(life_area: area), icon: "▤", match: :exact },
       { name: "Projets", path: projects_path(life_area: area), icon: "▧" },
       { name: "Tâches", path: tasks_path(life_area: area), icon: "✓" },
       { name: "Notes", path: notes_path(life_area: area), icon: "✎" }
     ]
+
+    if area == "personal"
+      sections += [
+        { name: "Comptes", path: accounts_path(life_area: area), icon: "▥" },
+        { name: "Opérations", path: transactions_path(life_area: area), icon: "⇅" }
+      ]
+    end
+
+    sections
   end
 
   # The dashboard path ("/work") must not light up for "/work/tasks", hence :exact.
@@ -53,23 +63,24 @@ module ApplicationHelper
     end
   end
 
-  # ALTEA's face: one canonical portrait, used in the sidebar, the intro and the hero.
-  def altea_avatar
-    "altea/avatar.png"
+  # Drop a portrait at app/assets/images/altea/holo.{png,webp,jpeg,jpg} and the
+  # chamber projects it — chromatic ghosts, slices, scan lines, all reacting to
+  # her voice. Without it she falls back to the figure drawn in code
+  # (app/javascript/altea_figure.js).
+  HOLO_CANDIDATES = %w[holo.png holo.webp holo.jpeg holo.jpg].freeze
+
+  def altea_holo_image
+    return @altea_holo_image if defined?(@altea_holo_image)
+
+    name = HOLO_CANDIDATES.find { |file| Rails.root.join("app/assets/images/altea", file).exist? }
+    @altea_holo_image = name && "altea/#{name}"
   end
 
-  # Ambient artwork set, kept for backgrounds and future screens.
   def altea_portrait(index = 1)
     "altea/altea-0#{index}.png"
   end
 
-  # Lines ALTEA speaks on first entry, in order.
-  def altea_intro_lines
-    [
-      "Bonjour.",
-      "Je suis ALTEA.",
-      "Votre assistante de vie, professionnelle et personnelle.",
-      "Je garde un œil sur vos projets, vos tâches et vos notes."
-    ]
+  def altea_avatar
+    altea_holo_image || "altea/avatar.png"
   end
 end

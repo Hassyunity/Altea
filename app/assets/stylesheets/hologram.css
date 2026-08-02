@@ -1,0 +1,295 @@
+/* ALTEA — her projection and the chamber around it.
+ *
+ * She is projected from her portrait, which is never distorted: only her
+ * mouth moves, through lip-sync frames cross-faded on her voice. The chamber
+ * (emitter, beam, orbital bands, rising dust, platform) reads --energy, the
+ * same value the mouth follows.
+ *
+ * `.chamber__figure` styles the canvas-drawn figure in altea_figure.js, kept
+ * dormant — nothing renders it today.
+ *
+ * Loaded after components.css, before intro.css.
+ */
+
+.chamber {
+  position: relative;
+  height: 560px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  --e: var(--energy, 0);
+}
+
+/* the projection surface */
+.chamber__figure {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 480px;
+  margin-bottom: 34px;
+  display: block;
+  /* the canvas paints with the accent it reads from here */
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------ the rig */
+
+.chamber__rig {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 190px;
+  height: 34px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 1px solid var(--accent-line);
+  background: radial-gradient(ellipse at center, var(--accent-soft), transparent 70%);
+  box-shadow: 0 0 26px var(--accent-glow);
+}
+
+.chamber__beam {
+  position: absolute;
+  top: 18px;
+  bottom: 46px;
+  left: 50%;
+  width: 300px;
+  transform: translateX(-50%);
+  clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, var(--accent-soft), rgba(63, 224, 255, 0.04) 60%, transparent);
+  opacity: calc(0.4 + var(--e) * 0.4);
+  pointer-events: none;
+}
+
+/* Flat bands: rotating an ellipse in 2D makes it tumble instead of orbit, so
+   the movement lives in the pulse and in the dust rising through them. */
+.chamber__ring {
+  position: absolute;
+  left: 50%;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  border-top-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  transform: translateX(-50%);
+  opacity: calc(0.45 + var(--e) * 0.45);
+  box-shadow: 0 0 18px var(--accent-glow);
+  pointer-events: none;
+}
+
+.chamber__ring--head { top: 40px; width: 214px; height: 46px; animation: band 4.6s ease-in-out infinite; }
+.chamber__ring--waist { top: 268px; width: 288px; height: 62px; animation: band 5.8s ease-in-out 0.6s infinite; }
+.chamber__ring--feet { bottom: 74px; width: 246px; height: 54px; animation: band 6.6s ease-in-out 1.2s infinite; }
+
+@keyframes band {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.035); }
+}
+
+/* the platform she stands on */
+.chamber__platform {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 330px;
+  height: 84px;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.chamber__platform i {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid var(--accent-line);
+}
+
+.chamber__platform i:nth-child(1) { width: 100%; height: 100%; background: radial-gradient(ellipse at center, var(--accent-soft), transparent 72%); }
+.chamber__platform i:nth-child(2) { width: 74%; height: 72%; }
+.chamber__platform i:nth-child(3) { width: 48%; height: 46%; animation: ring-pulse 3.2s ease-in-out infinite; }
+
+.chamber__platform i:nth-child(4) {
+  width: 26%;
+  height: 24%;
+  border: none;
+  background: radial-gradient(ellipse at center, #fff, var(--accent) 40%, transparent 72%);
+  box-shadow: 0 0 calc(26px + var(--e) * 54px) var(--accent-glow);
+}
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* particles rising through the beam */
+.chamber__dust { position: absolute; inset: 40px 0 50px; pointer-events: none; }
+
+.chamber__dust i {
+  position: absolute;
+  bottom: 0;
+  left: calc(50% + (var(--p) - 7) * 15px);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  opacity: 0;
+  animation: dust-rise 6s linear infinite;
+  animation-delay: calc(var(--p) * 0.42s);
+}
+
+@keyframes dust-rise {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  12% { opacity: 0.9; }
+  85% { opacity: 0.5; }
+  100% { transform: translateY(-380px) scale(1.1); opacity: 0; }
+}
+
+/* ------------------------------------------- projected portrait */
+
+.chamber__projection {
+  position: relative;
+  z-index: 2;
+  width: 300px;
+  height: 470px;
+  margin-bottom: 40px;
+  animation: projection-float 7s ease-in-out infinite;
+}
+
+@keyframes projection-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* the stack itself, shared by the chamber and the sidebar HUD */
+.holo-fig {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+  --e: var(--energy, 0);
+}
+
+/* Fade all four sides into the beam. Without the horizontal pass the portrait
+   shows a hard rectangular edge — the glitch layers used to hide it. */
+.holo-fig--chamber {
+  -webkit-mask-image:
+    linear-gradient(180deg, transparent, #000 9%, #000 78%, transparent 99%),
+    linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image:
+    linear-gradient(180deg, transparent, #000 9%, #000 78%, transparent 99%),
+    linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.holo-fig--hud {
+  -webkit-mask-image: linear-gradient(180deg, #000 62%, rgba(0, 0, 0, 0.4) 86%, transparent);
+  mask-image: linear-gradient(180deg, #000 62%, rgba(0, 0, 0, 0.4) 86%, transparent);
+}
+
+.holo-fig--hud .holo-fig__layer img {
+  object-position: 50% 14%;
+  transform: scale(1.25);
+  transform-origin: 50% 22%;
+}
+
+.holo-fig__layer { position: absolute; inset: 0; display: block; }
+
+.holo-fig__layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  display: block;
+}
+
+.holo-fig__layer--base img { filter: saturate(1.35) contrast(1.08) brightness(1.06); }
+
+/* Lip-sync frames sit exactly on the portrait — same box, same object-fit —
+   so only the mouth differs. The controller cross-fades two neighbouring
+   frames every animation frame, so no CSS transition here: it would lag
+   behind and smear the articulation. */
+.holo-fig__mouth { opacity: 0; }
+.holo-fig__mouth img { filter: saturate(1.35) contrast(1.08) brightness(1.06); }
+
+.holo-fig__tint {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  mix-blend-mode: color;
+  opacity: calc(0.18 + var(--e) * 0.12);
+  pointer-events: none;
+}
+
+.holo-fig__lines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px 4px);
+  mix-blend-mode: overlay;
+  opacity: calc(0.5 + var(--e) * 0.5);
+  animation: holo-lines 3.2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes holo-lines { to { background-position-y: 12px; } }
+
+.holo-fig__band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 22%;
+  background: linear-gradient(180deg, transparent,
+    rgba(190, 250, 255, calc(0.05 + var(--e) * 0.22)) 45%,
+    rgba(255, 255, 255, calc(0.10 + var(--e) * 0.3)) 50%,
+    rgba(190, 250, 255, calc(0.05 + var(--e) * 0.22)) 55%, transparent);
+  mix-blend-mode: screen;
+  animation: holo-band 5.5s cubic-bezier(0.4, 0, 0.5, 1) infinite;
+  pointer-events: none;
+}
+
+.is-talking .holo-fig__band { animation-duration: 2.1s; }
+
+@keyframes holo-band {
+  0% { transform: translateY(420%); }
+  100% { transform: translateY(-120%); }
+}
+
+.intro .chamber__projection { clip-path: inset(100% 0 0 0); }
+
+.intro--turning .chamber__projection {
+  animation: figure-assemble 1.9s cubic-bezier(0.3, 0.85, 0.25, 1) forwards,
+             projection-float 7s ease-in-out 1.9s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chamber__projection, .holo-fig__lines, .holo-fig__band { animation: none; }
+  .holo-fig__mouth { opacity: 0 !important; }
+  .intro .chamber__projection { clip-path: none; }
+}
+
+/* ------------------------------------- she is scanned in on arrival */
+
+.intro .chamber__figure { clip-path: inset(100% 0 0 0); }
+
+.intro--turning .chamber__figure {
+  animation: figure-assemble 1.9s cubic-bezier(0.3, 0.85, 0.25, 1) forwards;
+}
+
+@keyframes figure-assemble {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+/* ---------------------------------------- the chamber answers her voice */
+
+.intro.is-talking .chamber__platform i:nth-child(4),
+.assistant.is-talking .holo__pad {
+  transform: translateX(-50%) scale(calc(1 + var(--energy, 0) * 0.14));
+}
+
+.intro.is-talking .chamber__ring { box-shadow: 0 0 calc(18px + var(--energy, 0) * 26px) var(--accent-glow); }
+
+@media (prefers-reduced-motion: reduce) {
+  .chamber__ring, .chamber__dust i, .chamber__platform i { animation: none; }
+  .intro .chamber__figure { clip-path: none; }
+}

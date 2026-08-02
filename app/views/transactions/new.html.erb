@@ -1,0 +1,19 @@
+<% content_for :title, "Nouvelle opération — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow"><%= area_meta(life_area)[:label] %> · Banque</span>
+    <h1>Nouvelle opération</h1>
+  </div>
+</header>
+
+<section class="panel">
+  <% if @accounts.any? %>
+    <%= render "form", transaction: @transaction, accounts: @accounts %>
+  <% else %>
+    <div class="empty">
+      Créez d'abord un compte.
+      <%= link_to "Nouveau compte", new_account_path, class: "panel__link" %>
+    </div>
+  <% end %>
+</section>

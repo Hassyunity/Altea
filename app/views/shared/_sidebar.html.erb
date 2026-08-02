@@ -1,13 +1,5 @@
 <aside class="sidebar">
-  <div class="brand">
-    <span class="brand__avatar">
-      <%= image_tag altea_avatar, alt: "Altea", loading: "eager" %>
-    </span>
-    <span class="brand__text">
-      <span class="brand__name">ALTEA</span>
-      <span class="brand__tag">assistant de vie</span>
-    </span>
-  </div>
+  <%= render "shared/assistant" %>
 
   <nav class="nav">
     <% LifeAreaScoped::LIFE_AREAS.each do |area| %>
@@ -34,8 +26,19 @@
     <% end %>
   </nav>
 
-  <div class="sidebar__foot">
-    <span class="pulse"></span>
-    <span>Altea en ligne</span>
+  <div class="sidebar__foot" data-controller="lock">
+    <button type="button" class="sidebar__hint" data-action="lock#palette">
+      Commandes <kbd>⌘</kbd><kbd>K</kbd>
+    </button>
+
+    <div class="sidebar__status">
+      <span class="pulse"></span>
+      <span>Altea en ligne</span>
+    </div>
+
+    <button type="button" class="sidebar__lock" data-action="lock#engage"
+            title="Revenir à l'écran d'accueil d'Altea">
+      <span aria-hidden="true">⏻</span> Déconnexion
+    </button>
   </div>
 </aside>

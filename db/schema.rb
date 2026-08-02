@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_30_131949) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_31_090100) do
+  create_table "accounts", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "kind", default: "bank", null: false
+    t.string "institution"
+    t.string "currency", default: "MGA", null: false
+    t.bigint "opening_balance_cents", default: 0, null: false
+    t.string "color"
+    t.text "notes"
+    t.boolean "archived", default: false, null: false
+    t.string "life_area", default: "personal", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["life_area", "archived"], name: "index_accounts_on_life_area_and_archived"
+  end
+
   create_table "notes", force: :cascade do |t|
     t.string "title", null: false
     t.text "body"
@@ -50,6 +65,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_30_131949) do
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
+  create_table "transactions", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.integer "transfer_account_id"
+    t.string "kind", default: "expense", null: false
+    t.bigint "amount_cents", null: false
+    t.date "occurred_on", null: false
+    t.string "category"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "occurred_on"], name: "index_transactions_on_account_id_and_occurred_on"
+    t.index ["account_id"], name: "index_transactions_on_account_id"
+    t.index ["kind", "category"], name: "index_transactions_on_kind_and_category"
+    t.index ["occurred_on"], name: "index_transactions_on_occurred_on"
+    t.index ["transfer_account_id"], name: "index_transactions_on_transfer_account_id"
+  end
+
   add_foreign_key "notes", "projects"
   add_foreign_key "tasks", "projects"
+  add_foreign_key "transactions", "accounts"
+  add_foreign_key "transactions", "accounts", column: "transfer_account_id"
 end

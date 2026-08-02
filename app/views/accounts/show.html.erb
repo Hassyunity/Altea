@@ -1,0 +1,58 @@
+<% content_for :title, "#{@account.name} — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow">
+      <%= account_kind_icon(@account.kind) %> <%= account_kind_label(@account.kind) %>
+      <% if @account.institution.present? %> · <%= @account.institution %><% end %>
+    </span>
+    <h1><span class="chip chip--<%= @account.color.presence || "cyan" %>"></span> <%= @account.name %></h1>
+    <p class="page-head__sub">
+      Solde d'ouverture <%= money(@account.opening_balance_cents, @account.currency) %>
+    </p>
+  </div>
+  <div class="page-head__actions">
+    <%= link_to "Opération", new_transaction_path(account_id: @account.id, return_to: "account"), class: "btn btn--primary" %>
+    <%= link_to "Éditer", edit_account_path(@account), class: "btn" %>
+  </div>
+</header>
+
+<div class="grid grid--stats" style="margin-bottom: 22px;">
+  <div class="stat stat--accent">
+    <div class="stat__value <%= "amount--out" if @balance_cents.negative? %>">
+      <%= money(@balance_cents, @account.currency) %>
+    </div>
+    <div class="stat__label">Solde actuel</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value amount--out"><%= money(@account.transactions.expenses.sum(:amount_cents), @account.currency) %></div>
+    <div class="stat__label">Dépenses cumulées</div>
+  </div>
+  <div class="stat">
+    <div class="stat__value amount--in"><%= money(@account.transactions.income.sum(:amount_cents), @account.currency) %></div>
+    <div class="stat__label">Revenus cumulés</div>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel__head">
+    <span class="panel__title">Dernières opérations</span>
+    <%= link_to "Toutes les opérations", transactions_path(account_id: @account.id), class: "panel__link" %>
+  </div>
+
+  <% if @transactions.any? %>
+    <ul class="tx-list">
+      <%= render partial: "transactions/transaction", collection: @transactions, as: :transaction,
+                 locals: { account_id: @account.id } %>
+    </ul>
+  <% else %>
+    <div class="empty">Aucune opération sur ce compte.</div>
+  <% end %>
+</section>
+
+<% if @account.notes.present? %>
+  <section class="panel" style="margin-top: 18px;">
+    <div class="panel__head"><span class="panel__title">Notes</span></div>
+    <div class="note-body"><%= @account.notes %></div>
+  </section>
+<% end %>

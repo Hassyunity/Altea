@@ -1,0 +1,14 @@
+<% content_for :title, "Opération — Altea" %>
+
+<header class="page-head">
+  <div>
+    <span class="page-head__eyebrow">
+      <%= area_meta(life_area)[:label] %> · <%= transaction_kind_label(@transaction.kind) %>
+    </span>
+    <h1>Modifier l'opération</h1>
+  </div>
+</header>
+
+<section class="panel">
+  <%= render "form", transaction: @transaction, accounts: @accounts %>
+</section>

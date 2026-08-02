@@ -90,6 +90,39 @@
       <% end %>
     </section>
 
+    <% if @accounts.present? %>
+      <section class="panel">
+        <div class="panel__head">
+          <span class="panel__title">Argent</span>
+          <%= link_to "Comptes", accounts_path, class: "panel__link" %>
+        </div>
+
+        <% @total_by_currency.each do |currency, cents| %>
+          <div class="account-card__balance <%= "amount--out" if cents.negative? %>" style="margin-top: 0;">
+            <%= money(cents, currency) %>
+          </div>
+        <% end %>
+
+        <div class="tx__meta" style="margin-bottom: 14px;">
+          <span><%= month_label(@money_month) %></span>
+          <span>Dépenses <span class="amount amount--out"><%= money(@month_expenses) %></span></span>
+          <span>Revenus <span class="amount amount--in"><%= money(@month_income) %></span></span>
+        </div>
+
+        <ul class="stack" style="gap: 9px;">
+          <% @accounts.first(4).each do |account| %>
+            <li style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px;">
+              <%= link_to account_path(account) do %>
+                <span class="chip chip--<%= account.color.presence || "cyan" %>"></span>
+                <%= account.name %>
+              <% end %>
+              <span class="mono muted"><%= money(@balances.fetch(account, 0), account.currency) %></span>
+            </li>
+          <% end %>
+        </ul>
+      </section>
+    <% end %>
+
     <section class="panel">
       <div class="panel__head">
         <span class="panel__title">Notes épinglées</span>
